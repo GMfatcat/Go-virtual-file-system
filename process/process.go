@@ -3,6 +3,8 @@ package process
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"strings"
 	"virtual-file-system/setting"
 	"virtual-file-system/user"
@@ -44,6 +46,27 @@ func ProcessInput(input string) error {
 			return registerNameErr
 		}
 
+	case "create-folder":
+		return nil
+
+	case "delete-folder":
+		return nil
+
+	case "list-folders":
+		return nil
+
+	case "rename-folder":
+		return nil
+
+	case "create-file":
+		return nil
+
+	case "delete-file":
+		return nil
+
+	case "list-files":
+		return nil
+
 	default:
 		return invalidCommandError
 	}
@@ -67,4 +90,11 @@ func extractInput(input string) ([]string, error) {
 	}
 
 	return parts, nil
+}
+
+// Clear the screen (Only for windows system)
+func ClearConsole() {
+	cmd := exec.Command("cmd", "/c", "cls")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 }

@@ -35,6 +35,9 @@ func (jsonObj *JSONData) RegisterName(userName, userInfoPath string) error {
 		if err := jsonObj.saveUserInfoToFile(userInfoPath); err != nil {
 			return fmt.Errorf("Error saving JSON data: %v", err)
 		}
+
+		fmt.Fprintf(os.Stdout, "Add user %s successfully.\n", userName)
+
 	} else {
 		return fmt.Errorf("The %s has already existed.\n", userName)
 	}

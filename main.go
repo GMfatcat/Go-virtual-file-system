@@ -39,6 +39,10 @@ func main() {
 			fmt.Fprintf(os.Stdout, "System Commands\n%s\n", setting.HelpCommand)
 			continue
 
+		case "clear":
+			process.ClearConsole()
+			continue
+
 		case "exit":
 			fmt.Fprintf(os.Stdout, "Exit System")
 			return
@@ -47,7 +51,7 @@ func main() {
 			fmt.Fprintf(os.Stdout, "Your input: %s\n", input)
 			// Process Input Here
 			if err := process.ProcessInput(input); err != nil {
-				fmt.Fprintf(os.Stderr, "Process Error：%v", err)
+				fmt.Fprintf(os.Stderr, "Error：%v", err)
 			}
 		}
 
