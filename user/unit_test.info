@@ -1,0 +1,8 @@
+# unit test for package user
+
+Makes sure the current directory is ./virtual-file-system
+```
+go test -v ./user
+```
+
+# Ouput test in the command line,also generate a test_user_info.json

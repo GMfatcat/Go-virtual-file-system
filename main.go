@@ -6,11 +6,17 @@ import (
 	"os"
 	"strings"
 	"virtual-file-system/setting"
+	"virtual-file-system/user"
 )
 
 func main() {
 
-	// Welcome User
+	// Check if userinfo json exists, create if not exist
+	if err := user.CheckUserInfoExists(setting.UserInfoPath); err != nil {
+		return err
+	}
+
+	// Start System
 	fmt.Println("Enter a command ('help' for command information, 'exit' to quit)")
 
 	// Create a Infinite Loop to simulate CLI Environment
@@ -33,9 +39,9 @@ func main() {
 		case "exit":
 			fmt.Println("Exit System")
 			return
-		// Process Input
 		default:
 			fmt.Printf("Your input: %s\n", input)
+			// Process Input Here
 		}
 
 	}

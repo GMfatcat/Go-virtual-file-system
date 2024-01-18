@@ -20,18 +20,17 @@ TBD
 `
 
 /* Basic Data Structures */
-
 type UserInfo struct {
-	Folders []Folder
+	Folders []Folder `json:"folders"`
 }
 
 type Folder struct {
-	Name        string
-	Description string
-	Files       []File
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Files       []File `json:"files"`
 }
 
 type File struct {
-	Name        string
-	Description string
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
