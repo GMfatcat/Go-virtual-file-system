@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"virtual-file-system/process"
 	"virtual-file-system/setting"
 	"virtual-file-system/user"
 )
@@ -13,11 +14,11 @@ func main() {
 
 	// Check if userinfo json exists, create if not exist
 	if err := user.CheckUserInfoExists(setting.UserInfoPath); err != nil {
-		return err
+		fmt.Fprintf(os.Stderr, "Check userinfo Error：%v", err)
 	}
 
 	// Start System
-	fmt.Println("Enter a command ('help' for command information, 'exit' to quit)")
+	fmt.Fprintf(os.Stdout, "Enter a command ('help' for command information, 'exit' to quit)\n")
 
 	// Create a Infinite Loop to simulate CLI Environment
 	for {
@@ -26,22 +27,28 @@ func main() {
 		reader := bufio.NewReader(os.Stdin)
 		input, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Println("Input Error：", err)
+			fmt.Fprintf(os.Stderr, "Input Error：%v", err)
 			return
 		}
 
 		input = strings.TrimSpace(input)
 
 		switch input {
+
 		case "help":
-			fmt.Printf("System Commands\n%s\n", setting.HelpCommand)
+			fmt.Fprintf(os.Stdout, "System Commands\n%s\n", setting.HelpCommand)
 			continue
+
 		case "exit":
-			fmt.Println("Exit System")
+			fmt.Fprintf(os.Stdout, "Exit System")
 			return
+
 		default:
-			fmt.Printf("Your input: %s\n", input)
+			fmt.Fprintf(os.Stdout, "Your input: %s\n", input)
 			// Process Input Here
+			if err := process.ProcessInput(input); err != nil {
+				fmt.Fprintf(os.Stderr, "Process Error：%v", err)
+			}
 		}
 
 	}
