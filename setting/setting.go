@@ -1,9 +1,23 @@
 /* System Setting*/
 package setting
 
-var (
+const (
 	UserInfoPath = "./user/user_info.json"
 )
+
+/* Help Command */
+var HelpCommand = `
+Valid Commands:
+[] means that the input is required
+[]? means that the input is optional
+
+Usage: Register one user
+Command: register [username]
+
+TBD
+TBD
+TBD
+`
 
 /* Basic Data Structures */
 

@@ -1,20 +1,43 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
-	"log"
-	"virtual-file-system/user"
+	"os"
+	"strings"
+	"virtual-file-system/setting"
 )
 
 func main() {
-	username := "Tom"
-	fmt.Println("Starting...")
-	if err := user.SetName(username); err != nil {
 
-		log.Println(err)
+	// Welcome User
+	fmt.Println("Enter a command ('help' for command information, 'exit' to quit)")
 
-	} else {
-		fmt.Printf("Add %s successfully\n", username)
+	// Create a Infinite Loop to simulate CLI Environment
+	for {
+
+		fmt.Print("# ")
+		reader := bufio.NewReader(os.Stdin)
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Input Error：", err)
+			return
+		}
+
+		input = strings.TrimSpace(input)
+
+		switch input {
+		case "help":
+			fmt.Printf("System Commands\n%s\n", setting.HelpCommand)
+			continue
+		case "exit":
+			fmt.Println("Exit System")
+			return
+		// Process Input
+		default:
+			fmt.Printf("Your input: %s\n", input)
+		}
+
 	}
 
 }
