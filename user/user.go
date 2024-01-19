@@ -223,7 +223,7 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 		if sortRule == "asc" {
 			sort.Sort(byTime(userInfo.Folders))
 		} else {
-			sort.Sort(sort.Reverse(byName(userInfo.Folders)))
+			sort.Sort(sort.Reverse(byTime(userInfo.Folders)))
 		}
 	}
 

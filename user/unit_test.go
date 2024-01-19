@@ -170,3 +170,32 @@ func TestFoldernameCheck(t *testing.T) {
 		t.Error("Expected no error,but got one")
 	}
 }
+
+func TestOsRenameFolder(t *testing.T) {
+
+	jsonObj, err := ReadUserInfo(testUserInfoPath)
+	if err != nil {
+		t.Error("Expected no error,but got one")
+	}
+	// Change Foldername
+	var inputParts = []string{"rename-folder", "fatcat", "folder2", "folderNew"}
+	if changeFoldernameErr := jsonObj.OsRenameFolder(inputParts, testUserInfoPath); changeFoldernameErr != nil {
+		t.Error("Expected no error, but got one")
+	} else {
+		t.Log("Expected no error, and got none")
+	}
+	// Change it back
+	var inputParts2 = []string{"rename-folder", "fatcat", "folderNew", "folder2"}
+	if changeFoldernameErr2 := jsonObj.OsRenameFolder(inputParts2, testUserInfoPath); changeFoldernameErr2 != nil {
+		t.Error("Expected no error, but got one")
+	} else {
+		t.Log("Expected no error, and got none")
+	}
+	// Non-Exist Folder
+	var inputParts3 = []string{"rename-folder", "fatcat", "folderNew", "folder2"}
+	if changeFoldernameErr3 := jsonObj.OsRenameFolder(inputParts3, testUserInfoPath); changeFoldernameErr3 != nil {
+		t.Log("Expected one error, and got one")
+	} else {
+		t.Error("Expected no error, but got one")
+	}
+}
