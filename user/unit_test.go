@@ -239,3 +239,20 @@ func TestOsDeleteFolder(t *testing.T) {
 	}
 
 }
+
+func TestFolderNum(t *testing.T) {
+
+	t.Skip()
+
+	jsonObj, err := ReadUserInfo(testUserInfoPath)
+	if err != nil {
+		t.Error("Expected no error,but got one")
+	}
+	// user fatcat got 2 folders
+	folderNum := jsonObj.FolderNum("fatcat")
+	if folderNum != 2 {
+		t.Errorf("Expected 2 folder,but got %d", folderNum)
+	} else {
+		t.Log("Expected 2 folder,and got 2")
+	}
+}
