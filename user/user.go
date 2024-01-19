@@ -227,12 +227,12 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 		}
 	}
 
-	// Show Sort Result
-	fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
-	for _, folder := range userInfo.Folders {
-		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
-			folder.Name, folder.CreatedAt.Format(time.RFC822))
-	}
+	// // Show Sort Result
+	// fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
+	// for _, folder := range userInfo.Folders {
+	// 	fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
+	// 		folder.Name, folder.CreatedAt.Format(time.RFC822))
+	// }
 }
 
 func (jsonObj *JSONData) UsernameCheck(username string) error {

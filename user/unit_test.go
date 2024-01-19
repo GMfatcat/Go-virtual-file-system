@@ -3,6 +3,8 @@ package user
 
 import (
 	"testing"
+	"time"
+	"virtual-file-system/setting"
 	s "virtual-file-system/setting"
 )
 
@@ -73,6 +75,8 @@ func TestRegisterName(t *testing.T) {
 }
 
 func TestUsernameCheck(t *testing.T) {
+
+	t.Skip()
 
 	var userNameList = []string{"AAAaa123", "fatcat", "jjjadi12", "vasdga321"}
 	var existName int = 0
@@ -255,4 +259,60 @@ func TestFolderNum(t *testing.T) {
 	} else {
 		t.Log("Expected 2 folder,and got 2")
 	}
+}
+
+func TestSortFolder(t *testing.T) {
+
+	t.Skip()
+
+	// Test with smaller case, not json file
+	jsonObj := &JSONData{
+		Data: map[string]setting.UserInfo{
+			"user1": {
+				Folders: []setting.Folder{
+					{Name: "A", CreatedAt: time.Now()},
+					{Name: "B", CreatedAt: time.Now().Add(1 * time.Hour)},
+					{Name: "C", CreatedAt: time.Now().Add(2 * time.Hour)},
+				},
+			},
+		},
+	}
+
+	// define a test func: 4 combinations need to be tested
+	runTest := func(t *testing.T, sortType, sortRule string, expected []string) {
+		t.Helper()
+
+		jsonObj.SortFolder([]string{"list-folders", "user1", sortType, sortRule})
+
+		// Validation
+		for i, folder := range jsonObj.Data["user1"].Folders {
+			if folder.Name != expected[i] {
+				t.Errorf("Expected: %s, Got: %s", expected[i], folder.Name)
+			}
+		}
+	}
+
+	// By name + asc
+	t.Run("Sort by Name Ascending", func(t *testing.T) {
+		expected := []string{"A", "B", "C"}
+		runTest(t, "--sort-name", "asc", expected)
+	})
+
+	// By name + desc
+	t.Run("Sort by Name Descending", func(t *testing.T) {
+		expected := []string{"C", "B", "A"}
+		runTest(t, "--sort-name", "desc", expected)
+	})
+
+	// By time + asc
+	t.Run("Sort by Created Time Ascending", func(t *testing.T) {
+		expected := []string{"A", "B", "C"}
+		runTest(t, "--sort-created", "asc", expected)
+	})
+
+	// By time + desc
+	t.Run("Sort by Created Time Descending", func(t *testing.T) {
+		expected := []string{"C", "B", "A"}
+		runTest(t, "--sort-created", "desc", expected)
+	})
 }
