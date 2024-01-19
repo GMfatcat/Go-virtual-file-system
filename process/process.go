@@ -47,7 +47,10 @@ func ProcessInput(input string) error {
 		}
 
 	case "create-folder":
-		return nil
+		createFolderErr := jsonObj.CreateFolder(parts, setting.UserInfoPath)
+		if createFolderErr != nil {
+			return createFolderErr
+		}
 
 	case "delete-folder":
 		return nil
