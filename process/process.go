@@ -53,7 +53,10 @@ func ProcessInput(input string) error {
 		}
 
 	case "delete-folder":
-		return nil
+		deleteFolderErr := jsonObj.DeleteFolder(parts, setting.AppUserInfoPath)
+		if deleteFolderErr != nil {
+			return deleteFolderErr
+		}
 
 	case "list-folders":
 		return nil

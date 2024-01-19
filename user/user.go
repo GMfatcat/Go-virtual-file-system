@@ -133,6 +133,32 @@ func (jsonObj *JSONData) RenameFolder(inputParts []string, userInfoPath string) 
 	return nil
 }
 
+/* Command: delete-folder [username] [foldername] */
+func (jsonObj *JSONData) DeleteFolder(inputParts []string, userInfoPath string) error {
+	var username, foldername string
+	// Input check
+	commandLength := len(inputParts)
+	if commandLength != 3 {
+		return fmt.Errorf("delete-folder requires 3 arguments.\n")
+	}
+	username = inputParts[1]
+	foldername = inputParts[2]
+	// username check
+	if usernameErr := jsonObj.UsernameCheck(username); usernameErr != nil {
+		return usernameErr
+	}
+	// foldername check, need to found exist folder
+	if foldernameErr := jsonObj.FoldernameCheck(username, foldername); foldernameErr == nil {
+		return fmt.Errorf("The %s doesn't exist.\n", foldername)
+	}
+	// Delete Folder
+	if deleteFolderErr := jsonObj.OsDeleteFolder(inputParts, userInfoPath); deleteFolderErr != nil {
+		return deleteFolderErr
+	}
+
+	return nil
+}
+
 /* End of User Command Functions */
 
 /* Username & Foldername & Filename Check & Edit */
@@ -153,6 +179,16 @@ func (jsonObj *JSONData) FoldernameCheck(username, foldername string) error {
 	}
 
 	return nil
+}
+
+// return the index of folder, otherwise return -1
+func (jsonObj *JSONData) findFolderIndex(username, foldername string) int {
+	for i, folder := range jsonObj.Data[username].Folders {
+		if folder.Name == foldername {
+			return i
+		}
+	}
+	return -1
 }
 
 func (jsonObj *JSONData) OsRenameFolder(inputParts []string, userInfoPath string) error {
@@ -185,16 +221,6 @@ func (jsonObj *JSONData) OsRenameFolder(inputParts []string, userInfoPath string
 
 	fmt.Fprintf(os.Stdout, "Rename %s to %s successfully.\n", foldername, newFoldername)
 	return nil
-}
-
-// return the index of folder, otherwise return -1
-func (jsonObj *JSONData) findFolderIndex(username, foldername string) int {
-	for i, folder := range jsonObj.Data[username].Folders {
-		if folder.Name == foldername {
-			return i
-		}
-	}
-	return -1
 }
 
 func (jsonObj *JSONData) OsCreateFolder(inputParts []string, description bool, userInfoPath string) error {
@@ -233,6 +259,34 @@ func (jsonObj *JSONData) OsCreateFolder(inputParts []string, description bool, u
 	}
 
 	fmt.Fprintf(os.Stdout, "Create %s successfully.\n", foldername)
+	return nil
+}
+
+func (jsonObj *JSONData) OsDeleteFolder(inputParts []string, userInfoPath string) error {
+	var username, foldername string
+	username = inputParts[1]
+	foldername = inputParts[2]
+	//Update Json
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+	if folderIndex == -1 {
+		return fmt.Errorf("The %s doesn't exist.\n", foldername)
+	}
+
+	userInfo, _ := jsonObj.Data[username]
+	userInfo.Folders = append(userInfo.Folders[:folderIndex], userInfo.Folders[folderIndex+1:]...)
+	jsonObj.Data[username] = userInfo
+	// Save Json
+	if err := jsonObj.saveUserInfoToFile(userInfoPath); err != nil {
+		return fmt.Errorf("Error saving JSON data: %v", err)
+	}
+	//Os delete folder
+	var rootPath string = "./app"
+	folderPath := filepath.Join(rootPath, username, foldername)
+	if err := os.RemoveAll(folderPath); err != nil {
+		return fmt.Errorf("Error deleting folder: %v", err)
+	}
+
+	fmt.Fprintf(os.Stdout, "Delete %s successfully.\n", foldername)
 	return nil
 }
 
