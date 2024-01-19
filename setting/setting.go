@@ -3,8 +3,10 @@ package setting
 
 import "time"
 
+// App for real application,otherwise testing
 const (
-	UserInfoPath = "./user/user_info.json"
+	UserInfoPath    = "./user/user_info.json"
+	AppUserInfoPath = "./user/app_user_info.json"
 )
 
 /* Help Command */

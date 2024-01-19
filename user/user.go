@@ -20,13 +20,8 @@ type JSONData struct {
 func (jsonObj *JSONData) RegisterName(username, userInfoPath string) error {
 
 	// Check if username contains invalid characters using regex
-	usernameRegex, err := regexp.Compile(`^[A-Za-z0-9]{3,10}$`)
-	if err != nil {
-		return fmt.Errorf("Regex Compile Error: %v\n", err)
-	}
-
-	if !usernameRegex.MatchString(username) {
-		return fmt.Errorf("The %s contain invalid chars.\n", username)
+	if regexCheckErr := RegexCheck(username); regexCheckErr != nil {
+		return regexCheckErr
 	}
 
 	// Check input name exist in userinfo json
@@ -70,14 +65,22 @@ func (jsonObj *JSONData) CreateFolder(inputParts []string, userInfoPath string) 
 	var description bool = false
 
 	commandLength := len(inputParts)
-	username = inputParts[1]
-	foldername = inputParts[2]
-
 	if !(commandLength == 3 || commandLength == 4) {
 		return fmt.Errorf("create-folder requires 3 or 4 arguments.\n")
 	}
 
+	username = inputParts[1]
+	foldername = inputParts[2]
+	// Check folder name format
+	if regexCheckErr := RegexCheck(foldername); regexCheckErr != nil {
+		return regexCheckErr
+	}
+
+	// Check if description contains invalid characters using regex
 	if commandLength == 4 {
+		if regexCheckErr := RegexCheck(inputParts[3]); regexCheckErr != nil {
+			return regexCheckErr
+		}
 		description = true
 	}
 	// username check
@@ -198,5 +201,17 @@ func CheckUserInfoExists(jsonPath string) error {
 		return err
 	}
 
+	return nil
+}
+
+func RegexCheck(input string) error {
+	inputRegex, err := regexp.Compile(`^[A-Za-z0-9]{3,10}$`)
+	if err != nil {
+		return fmt.Errorf("Regex Compile Error: %v\n", err)
+	}
+
+	if !inputRegex.MatchString(input) {
+		return fmt.Errorf("The %s contain invalid chars.\n", input)
+	}
 	return nil
 }

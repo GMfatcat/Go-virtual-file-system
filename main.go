@@ -13,7 +13,7 @@ import (
 func main() {
 
 	// Check if userinfo json exists, create if not exist
-	if err := user.CheckUserInfoExists(setting.UserInfoPath); err != nil {
+	if err := user.CheckUserInfoExists(setting.AppUserInfoPath); err != nil {
 		fmt.Fprintf(os.Stderr, "Check userinfo Error：%v", err)
 	}
 

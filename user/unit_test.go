@@ -6,6 +6,8 @@ import (
 	s "virtual-file-system/setting"
 )
 
+// userInfoPath : test empty file
+// testUserInfoPath : test not-empty file
 var (
 	userInfoPath     = "test_user_info.json"
 	testUserInfoPath = "user_info.json"

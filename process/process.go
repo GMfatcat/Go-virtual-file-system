@@ -26,7 +26,7 @@ func ProcessInput(input string) error {
 	}
 
 	// Read UserInfo File
-	jsonObj, readUserInfoErr := user.ReadUserInfo(setting.UserInfoPath)
+	jsonObj, readUserInfoErr := user.ReadUserInfo(setting.AppUserInfoPath)
 	if readUserInfoErr != nil {
 		return readUserInfoErr
 	}
@@ -41,13 +41,13 @@ func ProcessInput(input string) error {
 	switch keyword {
 
 	case "register":
-		registerNameErr := jsonObj.RegisterName(parts[1], setting.UserInfoPath)
+		registerNameErr := jsonObj.RegisterName(parts[1], setting.AppUserInfoPath)
 		if registerNameErr != nil {
 			return registerNameErr
 		}
 
 	case "create-folder":
-		createFolderErr := jsonObj.CreateFolder(parts, setting.UserInfoPath)
+		createFolderErr := jsonObj.CreateFolder(parts, setting.AppUserInfoPath)
 		if createFolderErr != nil {
 			return createFolderErr
 		}
