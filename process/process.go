@@ -59,7 +59,7 @@ func ProcessInput(input string) error {
 		}
 
 	case "list-folders":
-		listFoldersErr := jsonObj.ListFolders(parts, setting.AppUserInfoPath)
+		listFoldersErr := jsonObj.ListFolders(parts)
 		if listFoldersErr != nil {
 			return listFoldersErr
 		}

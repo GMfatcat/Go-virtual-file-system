@@ -159,14 +159,62 @@ func (jsonObj *JSONData) DeleteFolder(inputParts []string, userInfoPath string) 
 	return nil
 }
 
-/* Command: List all folders of one user with conditions */
-func (jsonObj *JSONData) ListFolders(inputParts []string, userInfoPath string) error {
+/* Command: list-folders [username] [--sort-name | --sort-created] [asc|desc] */
+func (jsonObj *JSONData) ListFolders(inputParts []string) error {
+	var username, sortType, sortRule string
+	// Input check
+	commandLength := len(inputParts)
+	if commandLength != 4 {
+		return fmt.Errorf("rename-folder requires 4 arguments.\n")
+	}
+
+	username = inputParts[1]
+	sortType = inputParts[2]
+	sortRule = inputParts[3]
+
+	if !(sortType == "--sort-name" || sortType == "--sort-created") {
+		return fmt.Errorf("Invalid Sort Type, use --sort-name or --sort-created.\n")
+	}
+
+	if !(sortRule == "asc" || sortRule == "desc") {
+		return fmt.Errorf("Invalid Sort Rule, use asc or desc.\n")
+	}
+	// User check + User folder check
+	if usernameErr := jsonObj.UsernameCheck(username); usernameErr != nil {
+		return usernameErr
+	}
+	userFolderNum := jsonObj.FolderNum(username)
+	if userFolderNum == 0 {
+		return fmt.Errorf("Warning: The %s doesn't have any folders.\n", username)
+	}
+	// Sort Folder
+	jsonObj.SortFolder(inputParts)
+
 	return nil
 }
 
 /* End of User Command Functions */
 
 /* Username & Foldername & Filename Check & Edit */
+func (jsonObj *JSONData) FolderNum(username string) int {
+	userInfo, _ := jsonObj.Data[username]
+	numFolders := len(userInfo.Folders)
+	return numFolders
+}
+
+func (jsonObj *JSONData) SortFolder(inputParts []string) {
+	var username, sortType, sortRule string
+	username = inputParts[1]
+	sortType = inputParts[2]
+	sortRule = inputParts[3]
+
+	userInfo := jsonObj.Data[username]
+	fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
+	for _, folder := range userInfo.Folders {
+		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n", folder.Name, folder.CreatedAt)
+	}
+}
+
 func (jsonObj *JSONData) UsernameCheck(username string) error {
 
 	if _, ok := jsonObj.Data[username]; !ok {
