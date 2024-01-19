@@ -159,6 +159,11 @@ func (jsonObj *JSONData) DeleteFolder(inputParts []string, userInfoPath string) 
 	return nil
 }
 
+/* Command: List all folders of one user with conditions */
+func (jsonObj *JSONData) ListFolders(inputParts []string, userInfoPath string) error {
+	return nil
+}
+
 /* End of User Command Functions */
 
 /* Username & Foldername & Filename Check & Edit */
