@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"time"
 	s "virtual-file-system/setting"
 )
@@ -208,10 +209,29 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 	sortType = inputParts[2]
 	sortRule = inputParts[3]
 
+	// Select Sort Conditions
 	userInfo := jsonObj.Data[username]
+
+	switch sortType {
+	case "--sort-name":
+		if sortRule == "asc" {
+			sort.Sort(byName(userInfo.Folders))
+		} else {
+			sort.Sort(sort.Reverse(byName(userInfo.Folders)))
+		}
+	case "--sort-created":
+		if sortRule == "asc" {
+			sort.Sort(byTime(userInfo.Folders))
+		} else {
+			sort.Sort(sort.Reverse(byName(userInfo.Folders)))
+		}
+	}
+
+	// Show Sort Result
 	fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
 	for _, folder := range userInfo.Folders {
-		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n", folder.Name, folder.CreatedAt)
+		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
+			folder.Name, folder.CreatedAt.Format(time.RFC822))
 	}
 }
 
@@ -400,3 +420,20 @@ func RegexCheck(input string) error {
 	}
 	return nil
 }
+
+/* Sort Interface */
+type byName []s.Folder
+
+func (a byName) Len() int      { return len(a) }
+func (a byName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// define in asc
+func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
+type byTime []s.Folder
+
+func (a byTime) Len() int      { return len(a) }
+func (a byTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// define in asc
+func (a byTime) Less(i, j int) bool { return a[i].CreatedAt.Before(a[j].CreatedAt) }
