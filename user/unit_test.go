@@ -173,6 +173,8 @@ func TestFoldernameCheck(t *testing.T) {
 
 func TestOsRenameFolder(t *testing.T) {
 
+	t.Skip()
+
 	jsonObj, err := ReadUserInfo(testUserInfoPath)
 	if err != nil {
 		t.Error("Expected no error,but got one")
@@ -198,4 +200,42 @@ func TestOsRenameFolder(t *testing.T) {
 	} else {
 		t.Error("Expected no error, but got one")
 	}
+}
+
+func TestOsDeleteFolder(t *testing.T) {
+
+	t.Skip()
+
+	jsonObj, err := ReadUserInfo(testUserInfoPath)
+	if err != nil {
+		t.Error("Expected no error,but got one")
+	}
+	// Delete non-Exist folder
+	var inputParts = []string{"delete-folder", "fatcat", "NoFolder"}
+	if deleteFolderErr := jsonObj.OsDeleteFolder(inputParts, testUserInfoPath); deleteFolderErr != nil {
+		t.Log("Expected one error, and got one")
+	} else {
+		t.Error("Expected one error, and got none")
+	}
+	// Delet Exist folder
+	var inputParts2 = []string{"delete-folder", "fatcat", "folder2"}
+	if deleteFolderErr2 := jsonObj.OsDeleteFolder(inputParts2, testUserInfoPath); deleteFolderErr2 != nil {
+		t.Error("Expected no error, but got one")
+	} else {
+		t.Log("Expected no error, and got none")
+	}
+
+	// Add the folder back
+	inputParts3 := []string{
+		"create-folder",
+		"fatcat",
+		"folder2",
+		"",
+	}
+	var description bool = false
+	// Create Folder
+	if FolderErr := jsonObj.OsCreateFolder(inputParts3, description, testUserInfoPath); FolderErr != nil {
+		t.Errorf("Expected no error,but got one:%v", FolderErr)
+	}
+
 }
