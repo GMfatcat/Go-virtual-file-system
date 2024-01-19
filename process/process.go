@@ -59,7 +59,10 @@ func ProcessInput(input string) error {
 		return nil
 
 	case "rename-folder":
-		return nil
+		renameFolderErr := jsonObj.RenameFolder(parts, setting.AppUserInfoPath)
+		if renameFolderErr != nil {
+			return renameFolderErr
+		}
 
 	case "create-file":
 		return nil
