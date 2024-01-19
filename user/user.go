@@ -16,9 +16,13 @@ type JSONData struct {
 }
 
 /* User Command Functions */
-/*User name length 3~10,A-Za-z0-9*/
-/*Folder name length 3~10,A-Za-z0-9*/
-/*File name length 3~10,A-Za-z0-9*/
+/*
+User name length 3~10,A-Za-z0-9
+Folder name length 3~10,A-Za-z0-9
+File name length 3~10,A-Za-z0-9
+*/
+
+/* Command: register [username] */
 func (jsonObj *JSONData) RegisterName(username, userInfoPath string) error {
 
 	// Check if username contains invalid characters using regex
@@ -58,9 +62,7 @@ func (jsonObj *JSONData) saveUserInfoToFile(userInfoPath string) error {
 	return nil
 }
 
-/*
-Command: create-folder [username] [foldername] [description]?
-*/
+/* Command: create-folder [username] [foldername] [description]? */
 func (jsonObj *JSONData) CreateFolder(inputParts []string, userInfoPath string) error {
 
 	var username, foldername string
@@ -101,9 +103,7 @@ func (jsonObj *JSONData) CreateFolder(inputParts []string, userInfoPath string) 
 	return nil
 }
 
-/*
-Command: rename-folder [username] [foldername] [new-folder-name]
-*/
+/* Command: rename-folder [username] [foldername] [new-folder-name] */
 func (jsonObj *JSONData) RenameFolder(inputParts []string, userInfoPath string) error {
 	var username, foldername, newFoldername string
 	// Input check
