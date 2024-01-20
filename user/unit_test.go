@@ -350,3 +350,63 @@ func TestOsCreateFile(t *testing.T) {
 		t.Error("Expected one error, but got none")
 	}
 }
+
+func TestSortFile(t *testing.T) {
+
+	t.Skip()
+
+	// Test with smaller case, not json file
+	jsonObj := &JSONData{
+		Data: map[string]setting.UserInfo{
+			"user1": {
+				Folders: []setting.Folder{
+					{Name: "folder1", CreatedAt: time.Now(),
+						Files: []setting.File{
+							{Name: "file1", CreatedAt: time.Now()},
+							{Name: "file2", CreatedAt: time.Now().Add(1 * time.Hour)},
+							{Name: "file3", CreatedAt: time.Now().Add(2 * time.Hour)},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// define a test func: 4 combinations need to be tested
+	runTest := func(t *testing.T, sortType, sortRule string, expected []string) {
+		t.Helper()
+
+		jsonObj.SortFile([]string{"list-folders", "user1", "folder1", sortType, sortRule})
+
+		// Validation
+		for i, file := range jsonObj.Data["user1"].Folders[0].Files {
+			if file.Name != expected[i] {
+				t.Errorf("Expected: %s, Got: %s", expected[i], file.Name)
+			}
+		}
+	}
+
+	// By name + asc
+	t.Run("Sort by Name Ascending", func(t *testing.T) {
+		expected := []string{"file1", "file2", "file3"}
+		runTest(t, "--sort-name", "asc", expected)
+	})
+
+	// By name + desc
+	t.Run("Sort by Name Descending", func(t *testing.T) {
+		expected := []string{"file3", "file2", "file1"}
+		runTest(t, "--sort-name", "desc", expected)
+	})
+
+	// By time + asc
+	t.Run("Sort by Created Time Ascending", func(t *testing.T) {
+		expected := []string{"file1", "file2", "file3"}
+		runTest(t, "--sort-created", "asc", expected)
+	})
+
+	// By time + desc
+	t.Run("Sort by Created Time Descending", func(t *testing.T) {
+		expected := []string{"file3", "file2", "file1"}
+		runTest(t, "--sort-created", "desc", expected)
+	})
+}
