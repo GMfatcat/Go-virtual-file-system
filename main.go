@@ -18,7 +18,8 @@ func main() {
 	}
 
 	// Start System
-	fmt.Fprintf(os.Stdout, "Enter a command ('help' for command information, 'exit' to quit)\n")
+	systemWelcome := "Enter a command ('help' for command information, 'exit' to quit)\n"
+	fmt.Fprintf(os.Stdout, systemWelcome)
 
 	// Create a Infinite Loop to simulate CLI Environment
 	for {
@@ -53,7 +54,5 @@ func main() {
 				fmt.Fprintf(os.Stderr, "Error：%v", err)
 			}
 		}
-
 	}
-
 }

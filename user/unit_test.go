@@ -410,3 +410,7 @@ func TestSortFile(t *testing.T) {
 		runTest(t, "--sort-created", "desc", expected)
 	})
 }
+
+func TestOsDeleteFile(t *testing.T) {
+	t.Log("Testing not implemented yet")
+}

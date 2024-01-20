@@ -213,8 +213,8 @@ func (jsonObj *JSONData) CreateFile(inputParts []string, userInfoPath string) er
 		return fmt.Errorf("The %s doesn't exist.\n", foldername)
 	}
 	// Create File
-	if FileErr := jsonObj.OsCreateFile(inputParts, description, userInfoPath); FileErr != nil {
-		return FileErr
+	if createFileErr := jsonObj.OsCreateFile(inputParts, description, userInfoPath); createFileErr != nil {
+		return createFileErr
 	}
 
 	return nil
@@ -222,7 +222,33 @@ func (jsonObj *JSONData) CreateFile(inputParts []string, userInfoPath string) er
 
 /* Command: delete-file [username] [foldername] [filename] */
 func (jsonObj *JSONData) DeleteFile(inputParts []string, userInfoPath string) error {
-	fmt.Printf("Not implemented yet.\n")
+	var username, foldername, filename string
+	commandLength := len(inputParts)
+	if commandLength != 4 {
+		return fmt.Errorf("delete-file requires 4 arguments.\n")
+	}
+
+	username = inputParts[1]
+	foldername = inputParts[2]
+	filename = inputParts[3]
+
+	// username check
+	if usernameErr := jsonObj.UsernameCheck(username); usernameErr != nil {
+		return usernameErr
+	}
+	// foldername check: need folder to be exist
+	if foldernameErr := jsonObj.FoldernameCheck(username, foldername); foldernameErr == nil {
+		return fmt.Errorf("The %s doesn't exist.\n", foldername)
+	}
+	// filename check: need file to exist
+	if filenameErr := jsonObj.FilenameCheck(username, foldername, filename); filenameErr == nil {
+		return fmt.Errorf("The %s doesn't exist.\n", filename)
+	}
+	// Delete File
+	if deleteFileErr := jsonObj.OsDeleteFile(inputParts, userInfoPath); deleteFileErr != nil {
+		return deleteFileErr
+	}
+
 	return nil
 }
 
@@ -272,7 +298,7 @@ func (jsonObj *JSONData) ListFiles(inputParts []string) error {
 
 /* End of User Command Functions */
 
-/* Username & Foldername & Filename Check & Edit */
+/* Username & Foldername & Filename : Check & Edit */
 func (jsonObj *JSONData) FolderNum(username string) int {
 	userInfo, _ := jsonObj.Data[username]
 	numFolders := len(userInfo.Folders)
@@ -372,6 +398,19 @@ func (jsonObj *JSONData) FoldernameCheck(username, foldername string) error {
 	return nil
 }
 
+func (jsonObj *JSONData) FilenameCheck(username, foldername, filename string) error {
+
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+
+	for _, file := range jsonObj.Data[username].Folders[folderIndex].Files {
+		if file.Name == filename {
+			return fmt.Errorf("File %s has already exist.\n", filename)
+		}
+	}
+
+	return nil
+}
+
 // return the index of folder, otherwise return -1
 func (jsonObj *JSONData) findFolderIndex(username, foldername string) int {
 	for i, folder := range jsonObj.Data[username].Folders {
@@ -379,6 +418,19 @@ func (jsonObj *JSONData) findFolderIndex(username, foldername string) int {
 			return i
 		}
 	}
+	return -1
+}
+
+func (jsonObj *JSONData) findFileIndex(username, foldername, filename string) int {
+
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+
+	for i, file := range jsonObj.Data[username].Folders[folderIndex].Files {
+		if file.Name == filename {
+			return i
+		}
+	}
+
 	return -1
 }
 
@@ -524,6 +576,35 @@ func (jsonObj *JSONData) OsCreateFile(inputParts []string, description bool, use
 	return nil
 }
 
+func (jsonObj *JSONData) OsDeleteFile(inputParts []string, userInfoPath string) error {
+	var username, foldername, filename string
+	username = inputParts[1]
+	foldername = inputParts[2]
+	filename = inputParts[3]
+	//Update Json
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+	fileIndex := jsonObj.findFileIndex(username, foldername, filename)
+	userInfo, _ := jsonObj.Data[username]
+	userInfo.Folders[folderIndex].Files = append(userInfo.Folders[folderIndex].Files[:fileIndex],
+		userInfo.Folders[folderIndex].Files[fileIndex+1:]...)
+	jsonObj.Data[username] = userInfo
+	// Save Json
+	if err := jsonObj.saveUserInfoToFile(userInfoPath); err != nil {
+		return fmt.Errorf("Error saving JSON data: %v", err)
+	}
+	//Os delete file
+	var rootPath string = "./app"
+	filePath := filepath.Join(rootPath, username, foldername, filename)
+	if err := os.Remove(filePath); err != nil {
+		return fmt.Errorf("Error deleting file: %v", err)
+	}
+
+	fmt.Fprintf(os.Stdout, "Delete %s in %s/%s successfully.\n",
+		filename, username, foldername)
+
+	return nil
+}
+
 func (jsonObj *JSONData) saveUserInfoToFile(userInfoPath string) error {
 	jsonData, err := json.Marshal(jsonObj)
 	if err != nil {
@@ -550,7 +631,7 @@ func RegexCheck(input string) error {
 	return nil
 }
 
-/* End of Username & Foldername & Filename Check & Edit */
+/* End of Username & Foldername & Filename : Check & Edit */
 
 /* UserInfo Functions */
 
