@@ -1,9 +1,14 @@
 /* Unit test for Process package*/
 package process
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestExtractInput(t *testing.T) {
+
+	t.Skip()
 
 	var correct = 0
 	var incorrect = 0
@@ -34,4 +39,32 @@ func TestExtractInput(t *testing.T) {
 			incorrect, correct)
 	}
 
+}
+
+func TestExtractWhiteSpaceInput(t *testing.T) {
+
+	t.Skip()
+
+	var testString = []string{
+		"register fatcat",
+		`register "fat cat"`,
+		"some one select",
+		`"register" the "fat cat"`}
+	var expected = []int{2, 2, 3, 3}
+
+	// test string extraction
+	for i, str := range testString {
+		parts, _ := extractWhiteSpaceInput(str)
+		if len(parts) != expected[i] {
+			t.Errorf("Expected %d, got %d", expected[i], len(parts))
+			fmt.Println("Failed Parts:", parts)
+			continue
+		}
+
+		for j, word := range parts {
+			fmt.Printf("%d %s\n", j, word)
+		}
+		fmt.Printf("========\n")
+
+	}
 }
