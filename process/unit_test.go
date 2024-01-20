@@ -50,6 +50,7 @@ func TestExtractWhiteSpaceInput(t *testing.T) {
 		`register "fat cat"`,
 		"some one select",
 		`"register" the "fat cat"`}
+
 	var expected = []int{2, 2, 3, 3}
 
 	// test string extraction

@@ -1,7 +1,0 @@
-# unit test for package user
-
-Makes sure the current directory is ./virtual-file-system
-```
-go test -v ./user
-```
-

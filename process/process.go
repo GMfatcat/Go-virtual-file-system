@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"virtual-file-system/setting"
 	"virtual-file-system/user"
@@ -166,9 +167,21 @@ func extractWhiteSpaceInput(input string) ([]string, error) {
 	return parts, nil
 }
 
-// Clear the screen (Only for windows system)
+// Clear the screen
 func ClearConsole() {
-	cmd := exec.Command("cmd", "/c", "cls")
+	// detect os system
+	var cmd *exec.Cmd
+
+	if runtime.GOOS == "windows" {
+
+		cmd = exec.Command("cmd", "/c", "cls")
+
+	} else {
+
+		cmd = exec.Command("clear")
+	}
+
 	cmd.Stdout = os.Stdout
+
 	cmd.Run()
 }

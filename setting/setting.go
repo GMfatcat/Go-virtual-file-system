@@ -13,7 +13,7 @@ var SupportWhitespace = false
 
 /* Help Command */
 var HelpCommand = `
-Type "clear" to clear screen (only for windows system)
+Type "clear" to clear screen (For windows & Linux system)
 Type "status" to check whitespace support status
 Type "whitespace" to enable/disable support for whitespace in input
 --> ex. "user name"

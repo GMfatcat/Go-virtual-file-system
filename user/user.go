@@ -17,11 +17,6 @@ type JSONData struct {
 }
 
 /* User Command Functions */
-/*
-User name length 3~10,A-Za-z0-9
-Folder name length 3~10,A-Za-z0-9
-File name length 3~10,A-Za-z0-9
-*/
 
 /* Command: register [username] */
 func (jsonObj *JSONData) RegisterName(username, userInfoPath string) error {
@@ -619,6 +614,11 @@ func (jsonObj *JSONData) saveUserInfoToFile(userInfoPath string) error {
 	return nil
 }
 
+/*
+User name length 3~10,A-Za-z0-9
+Folder name length 3~10,A-Za-z0-9
+File name length 3~10,A-Za-z0-9
+*/
 func RegexCheck(input string) error {
 
 	var validInputRegexString string = `^[A-Za-z0-9]{3,10}$`
