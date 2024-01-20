@@ -228,7 +228,45 @@ func (jsonObj *JSONData) DeleteFile(inputParts []string, userInfoPath string) er
 
 /* Command: list-files [username] [foldername] [--sort-name | --sort-created] [asc|desc] */
 func (jsonObj *JSONData) ListFiles(inputParts []string) error {
-	fmt.Printf("Not implemented yet.\n")
+	var username, foldername, sortType, sortRule string
+	// Input check
+	commandLength := len(inputParts)
+	if commandLength != 5 {
+		return fmt.Errorf("list-files requires 5 arguments.\n")
+	}
+	username = inputParts[1]
+	foldername = inputParts[2]
+	sortType = inputParts[3]
+	sortRule = inputParts[4]
+
+	if !(sortType == "--sort-name" || sortType == "--sort-created") {
+		return fmt.Errorf("Invalid Sort Type, use --sort-name or --sort-created.\n")
+	}
+
+	if !(sortRule == "asc" || sortRule == "desc") {
+		return fmt.Errorf("Invalid Sort Rule, use asc or desc.\n")
+	}
+	// User check + User folder check
+	if usernameErr := jsonObj.UsernameCheck(username); usernameErr != nil {
+		return usernameErr
+	}
+	userFolderNum := jsonObj.FolderNum(username)
+	if userFolderNum == 0 {
+		return fmt.Errorf("Warning: The %s doesn't have any folders.\n", username)
+	}
+	// foldername check, need to found exist folder
+	if foldernameErr := jsonObj.FoldernameCheck(username, foldername); foldernameErr == nil {
+		return fmt.Errorf("The %s doesn't exist.\n", foldername)
+	}
+	// folder file number check
+	userFolderFileNum := jsonObj.FolderFileNum(username, foldername)
+	if userFolderFileNum == 0 {
+		return fmt.Errorf("Warning: The folder is empty.\n")
+	}
+
+	// Sort folder file
+	jsonObj.SortFile(inputParts)
+
 	return nil
 }
 
@@ -239,6 +277,13 @@ func (jsonObj *JSONData) FolderNum(username string) int {
 	userInfo, _ := jsonObj.Data[username]
 	numFolders := len(userInfo.Folders)
 	return numFolders
+}
+
+func (jsonObj *JSONData) FolderFileNum(username, foldername string) int {
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+	userInfo := jsonObj.Data[username].Folders[folderIndex]
+	numFolderFiles := len(userInfo.Files)
+	return numFolderFiles
 }
 
 func (jsonObj *JSONData) SortFolder(inputParts []string) {
@@ -253,15 +298,15 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 	switch sortType {
 	case "--sort-name":
 		if sortRule == "asc" {
-			sort.Sort(byName(userInfo.Folders))
+			sort.Sort(byFolderName(userInfo.Folders))
 		} else {
-			sort.Sort(sort.Reverse(byName(userInfo.Folders)))
+			sort.Sort(sort.Reverse(byFolderName(userInfo.Folders)))
 		}
 	case "--sort-created":
 		if sortRule == "asc" {
-			sort.Sort(byTime(userInfo.Folders))
+			sort.Sort(byFolderTime(userInfo.Folders))
 		} else {
-			sort.Sort(sort.Reverse(byTime(userInfo.Folders)))
+			sort.Sort(sort.Reverse(byFolderTime(userInfo.Folders)))
 		}
 	}
 
@@ -271,6 +316,41 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
 			folder.Name, folder.CreatedAt.Format(time.RFC822))
 	}
+}
+
+func (jsonObj *JSONData) SortFile(inputParts []string) {
+	var username, foldername, sortType, sortRule string
+	username = inputParts[1]
+	foldername = inputParts[2]
+	sortType = inputParts[3]
+	sortRule = inputParts[4]
+	// Select Sort Conditions
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+	userInfo := jsonObj.Data[username].Folders[folderIndex]
+
+	switch sortType {
+	case "--sort-name":
+		if sortRule == "asc" {
+			sort.Sort(byFileName(userInfo.Files))
+		} else {
+			sort.Sort(sort.Reverse(byFileName(userInfo.Files)))
+		}
+	case "--sort-created":
+		if sortRule == "asc" {
+			sort.Sort(byFileTime(userInfo.Files))
+		} else {
+			sort.Sort(sort.Reverse(byFileTime(userInfo.Files)))
+		}
+	}
+
+	// Show Sort Result
+	fmt.Fprintf(os.Stdout, "Folder: %s, Sort Type: %s, Sort Rule: %s\n",
+		foldername, sortType, sortRule)
+	for _, file := range userInfo.Files {
+		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
+			file.Name, file.CreatedAt.Format(time.RFC822))
+	}
+
 }
 
 func (jsonObj *JSONData) UsernameCheck(username string) error {
@@ -472,7 +552,7 @@ func RegexCheck(input string) error {
 
 /* End of Username & Foldername & Filename Check & Edit */
 
-/* UserInfo Functions*/
+/* UserInfo Functions */
 
 func ReadUserInfo(jsonPath string) (JSONData, error) {
 	var jsonObj JSONData
@@ -518,19 +598,42 @@ func CheckUserInfoExists(jsonPath string) error {
 	return nil
 }
 
+/* End of UserInfo Functions */
+
 /* Sort Interface */
-type byName []s.Folder
 
-func (a byName) Len() int      { return len(a) }
-func (a byName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+/* Folder Sort */
+type byFolderName []s.Folder
 
-// define in asc
-func (a byName) Less(i, j int) bool { return a[i].Name < a[j].Name }
-
-type byTime []s.Folder
-
-func (a byTime) Len() int      { return len(a) }
-func (a byTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byFolderName) Len() int      { return len(a) }
+func (a byFolderName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // define in asc
-func (a byTime) Less(i, j int) bool { return a[i].CreatedAt.Before(a[j].CreatedAt) }
+func (a byFolderName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
+type byFolderTime []s.Folder
+
+func (a byFolderTime) Len() int      { return len(a) }
+func (a byFolderTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// define in asc
+func (a byFolderTime) Less(i, j int) bool { return a[i].CreatedAt.Before(a[j].CreatedAt) }
+
+/* File Sort */
+type byFileName []s.File
+
+func (a byFileName) Len() int      { return len(a) }
+func (a byFileName) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// define in asc
+func (a byFileName) Less(i, j int) bool { return a[i].Name < a[j].Name }
+
+type byFileTime []s.File
+
+func (a byFileTime) Len() int      { return len(a) }
+func (a byFileTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// define in asc
+func (a byFileTime) Less(i, j int) bool { return a[i].CreatedAt.Before(a[j].CreatedAt) }
+
+/* End of Sort Interface */
