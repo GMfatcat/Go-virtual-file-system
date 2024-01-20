@@ -316,3 +316,37 @@ func TestSortFolder(t *testing.T) {
 		runTest(t, "--sort-created", "desc", expected)
 	})
 }
+
+func TestOsCreateFile(t *testing.T) {
+
+	t.Skip()
+
+	jsonObj, err := ReadUserInfo(testUserInfoPath)
+	if err != nil {
+		t.Error("Expected no error,but got one")
+	}
+	// Create File in Exist Folder without description
+	var inputParts = []string{"create-file", "fatcat", "folder2", "file1"}
+	var description bool = false
+	if createFileErr := jsonObj.OsCreateFile(inputParts, description, testUserInfoPath); createFileErr == nil {
+		t.Log("Expected no error, and got none")
+	} else {
+		t.Error("Expected no error, but got one")
+	}
+	// Create File in Exist Folder with description
+	var inputParts2 = []string{"create-file", "fatcat", "folder2", "file2", "dddd"}
+	var description2 bool = true
+	if createFileErr := jsonObj.OsCreateFile(inputParts2, description2, testUserInfoPath); createFileErr == nil {
+		t.Log("Expected no error, and got none")
+	} else {
+		t.Error("Expected no error, but got one")
+	}
+	// Create File in Non-Exist Folder
+	var inputParts3 = []string{"create-file", "fatcat", "folder87", "file3"}
+	var description3 bool = false
+	if createFileErr := jsonObj.OsCreateFile(inputParts3, description3, testUserInfoPath); createFileErr != nil {
+		t.Log("Expected one error, and got one")
+	} else {
+		t.Error("Expected one error, but got none")
+	}
+}
