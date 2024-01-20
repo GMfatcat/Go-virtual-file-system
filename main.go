@@ -44,6 +44,15 @@ func main() {
 			process.ClearConsole()
 			continue
 
+		case "status":
+			fmt.Fprintf(os.Stdout, "Whitespace Support:%v\n", setting.SupportWhitespace)
+			continue
+
+		case "whitespace":
+			setting.SupportWhitespace = !setting.SupportWhitespace
+			fmt.Fprintf(os.Stdout, "Set Whitespace Support:%v\n", setting.SupportWhitespace)
+			continue
+
 		case "exit":
 			fmt.Fprintf(os.Stdout, "Exit System")
 			return

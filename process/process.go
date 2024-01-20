@@ -14,15 +14,27 @@ var (
 	invalidCommandError = fmt.Errorf("Invalid command,type help for more information\n")
 	noKeywordError      = fmt.Errorf("No keyword found in the input\n")
 	noArgumentError     = fmt.Errorf("No keyword argument found in the input\n")
+	unClosedQuoteError  = fmt.Errorf("Unclosed double quote\n")
 )
 
 /*Example: register username*/
 func ProcessInput(input string) error {
 
+	var parts []string
+	var extractErr error
+
+	// Check if whitespace support is enabled
 	// Extract command into parts, Keyword will be the first part
-	parts, extractErr := extractInput(input)
-	if extractErr != nil {
-		return extractErr
+	if setting.SupportWhitespace {
+		parts, extractErr = extractWhiteSpaceInput(input)
+		if extractErr != nil {
+			return extractErr
+		}
+	} else {
+		parts, extractErr = extractInput(input)
+		if extractErr != nil {
+			return extractErr
+		}
 	}
 
 	// Read UserInfo File
@@ -101,6 +113,47 @@ func extractInput(input string) ([]string, error) {
 	emptyStringList := []string{}
 
 	parts := strings.Fields(input)
+
+	if len(parts) == 0 {
+		return emptyStringList, noKeywordError
+	}
+
+	if len(parts) == 1 {
+		return emptyStringList, noArgumentError
+	}
+
+	return parts, nil
+}
+
+// 1 keyword + at least 1 args, support arguments in ""
+func extractWhiteSpaceInput(input string) ([]string, error) {
+
+	emptyStringList := []string{}
+
+	var parts []string
+	var currentPart string
+	var insideQuotes bool = false
+
+	for _, char := range input {
+		if char == ' ' && !insideQuotes {
+			if currentPart != "" {
+				parts = append(parts, currentPart)
+				currentPart = ""
+			}
+		} else if char == '"' {
+			insideQuotes = !insideQuotes
+		} else {
+			currentPart += string(char)
+		}
+	}
+
+	if currentPart != "" {
+		parts = append(parts, currentPart)
+	}
+
+	if insideQuotes {
+		return emptyStringList, unClosedQuoteError
+	}
 
 	if len(parts) == 0 {
 		return emptyStringList, noKeywordError

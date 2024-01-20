@@ -620,7 +620,14 @@ func (jsonObj *JSONData) saveUserInfoToFile(userInfoPath string) error {
 }
 
 func RegexCheck(input string) error {
-	inputRegex, err := regexp.Compile(`^[A-Za-z0-9]{3,10}$`)
+
+	var validInputRegexString string = `^[A-Za-z0-9]{3,10}$`
+
+	if s.SupportWhitespace {
+		validInputRegexString = `^[A-Za-z0-9 ]{3,10}$`
+	}
+
+	inputRegex, err := regexp.Compile(validInputRegexString)
 	if err != nil {
 		return fmt.Errorf("Regex Compile Error: %v\n", err)
 	}
@@ -628,6 +635,7 @@ func RegexCheck(input string) error {
 	if !inputRegex.MatchString(input) {
 		return fmt.Errorf("The %s contain invalid chars.\n", input)
 	}
+
 	return nil
 }
 
