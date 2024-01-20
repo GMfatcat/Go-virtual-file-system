@@ -412,5 +412,28 @@ func TestSortFile(t *testing.T) {
 }
 
 func TestOsDeleteFile(t *testing.T) {
-	t.Log("Testing not implemented yet")
+
+	t.Skip()
+
+	jsonObj, err := ReadUserInfo(testUserInfoPath)
+	if err != nil {
+		t.Error("Expected no error,but got one")
+	}
+	//Add the file to folder2
+	var inputParts = []string{"create-file", "fatcat", "folder2", "file3"}
+	var description bool = false
+	if createFileErr := jsonObj.OsCreateFile(inputParts, description, testUserInfoPath); createFileErr != nil {
+		t.Error("Expected no error, but got one")
+	} else {
+		t.Log("Expected no error, and got none")
+	}
+
+	// Delete one exist file in exist folder
+	var inputParts2 = []string{"delete-folder", "fatcat", "folder2", "file3"}
+	if deleteFolderErr := jsonObj.OsDeleteFile(inputParts2, testUserInfoPath); deleteFolderErr != nil {
+		t.Error("Expected no error, but got one")
+	} else {
+		t.Log("Expected no error, and got none")
+	}
+
 }
