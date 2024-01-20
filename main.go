@@ -48,7 +48,6 @@ func main() {
 			return
 
 		default:
-			// fmt.Fprintf(os.Stdout, "Your input: %s\n", input)
 			// Process Input Here
 			if err := process.ProcessInput(input); err != nil {
 				fmt.Fprintf(os.Stderr, "Error：%v", err)

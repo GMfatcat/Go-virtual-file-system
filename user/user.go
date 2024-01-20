@@ -49,20 +49,6 @@ func (jsonObj *JSONData) RegisterName(username, userInfoPath string) error {
 	return nil
 }
 
-func (jsonObj *JSONData) saveUserInfoToFile(userInfoPath string) error {
-	jsonData, err := json.Marshal(jsonObj)
-	if err != nil {
-		return err
-	}
-
-	// Write File
-	if err = ioutil.WriteFile(userInfoPath, jsonData, 0644); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 /* Command: create-folder [username] [foldername] [description]? */
 func (jsonObj *JSONData) CreateFolder(inputParts []string, userInfoPath string) error {
 
@@ -194,6 +180,58 @@ func (jsonObj *JSONData) ListFolders(inputParts []string) error {
 	return nil
 }
 
+/* Command: create-file [username] [foldername] [filename] [description]? */
+func (jsonObj *JSONData) CreateFile(inputParts []string, userInfoPath string) error {
+	var username, foldername, filename string
+	var description bool = false
+
+	commandLength := len(inputParts)
+	if !(commandLength == 4 || commandLength == 5) {
+		return fmt.Errorf("create-file requires 4 or 5 arguments.\n")
+	}
+
+	username = inputParts[1]
+	foldername = inputParts[2]
+	filename = inputParts[3]
+	// Check file name format
+	if regexCheckErr := RegexCheck(filename); regexCheckErr != nil {
+		return regexCheckErr
+	}
+	// Check if description contains invalid characters using regex
+	if commandLength == 5 {
+		if regexCheckErr := RegexCheck(inputParts[4]); regexCheckErr != nil {
+			return regexCheckErr
+		}
+		description = true
+	}
+	// username check
+	if usernameErr := jsonObj.UsernameCheck(username); usernameErr != nil {
+		return usernameErr
+	}
+	// foldername check: need folder to be exist
+	if foldernameErr := jsonObj.FoldernameCheck(username, foldername); foldernameErr == nil {
+		return fmt.Errorf("The %s doesn't exist.\n", foldername)
+	}
+	// Create File
+	if FileErr := jsonObj.OsCreateFile(inputParts, description, userInfoPath); FileErr != nil {
+		return FileErr
+	}
+
+	return nil
+}
+
+/* Command: delete-file [username] [foldername] [filename] */
+func (jsonObj *JSONData) DeleteFile(inputParts []string, userInfoPath string) error {
+	fmt.Printf("Not implemented yet.\n")
+	return nil
+}
+
+/* Command: list-files [username] [foldername] [--sort-name | --sort-created] [asc|desc] */
+func (jsonObj *JSONData) ListFiles(inputParts []string) error {
+	fmt.Printf("Not implemented yet.\n")
+	return nil
+}
+
 /* End of User Command Functions */
 
 /* Username & Foldername & Filename Check & Edit */
@@ -227,12 +265,12 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 		}
 	}
 
-	// // Show Sort Result
-	// fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
-	// for _, folder := range userInfo.Folders {
-	// 	fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
-	// 		folder.Name, folder.CreatedAt.Format(time.RFC822))
-	// }
+	// Show Sort Result
+	fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
+	for _, folder := range userInfo.Folders {
+		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
+			folder.Name, folder.CreatedAt.Format(time.RFC822))
+	}
 }
 
 func (jsonObj *JSONData) UsernameCheck(username string) error {
@@ -363,6 +401,77 @@ func (jsonObj *JSONData) OsDeleteFolder(inputParts []string, userInfoPath string
 	return nil
 }
 
+func (jsonObj *JSONData) OsCreateFile(inputParts []string, description bool, userInfoPath string) error {
+	var username, foldername, filename string
+	var fileDescription string = ""
+
+	username = inputParts[1]
+	foldername = inputParts[2]
+	filename = inputParts[3]
+
+	if description {
+		fileDescription = inputParts[4]
+	}
+
+	folderIndex := jsonObj.findFolderIndex(username, foldername)
+	if folderIndex == -1 {
+		return fmt.Errorf("The %s doesn't exist.\n", foldername)
+	}
+	// Record to Userinfo
+	newFile := s.File{
+		Name:        filename,
+		Description: fileDescription,
+		CreatedAt:   time.Now(),
+	}
+	userInfo, _ := jsonObj.Data[username]
+	userInfo.Folders[folderIndex].Files = append(userInfo.Folders[folderIndex].Files, newFile)
+	jsonObj.Data[username] = userInfo
+	// Save Json
+	if err := jsonObj.saveUserInfoToFile(userInfoPath); err != nil {
+		return fmt.Errorf("Error saving JSON data: %v", err)
+	}
+	// Os Create File
+	var rootPath string = "./app"
+	filePath := filepath.Join(rootPath, username, foldername, filename)
+	file, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("Error creating file: %v", err)
+	}
+	defer file.Close()
+
+	fmt.Fprintf(os.Stdout, "Create %s in %s/%s successfully.\n", filename, username, foldername)
+
+	return nil
+}
+
+func (jsonObj *JSONData) saveUserInfoToFile(userInfoPath string) error {
+	jsonData, err := json.Marshal(jsonObj)
+	if err != nil {
+		return err
+	}
+
+	// Write File
+	if err = ioutil.WriteFile(userInfoPath, jsonData, 0644); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func RegexCheck(input string) error {
+	inputRegex, err := regexp.Compile(`^[A-Za-z0-9]{3,10}$`)
+	if err != nil {
+		return fmt.Errorf("Regex Compile Error: %v\n", err)
+	}
+
+	if !inputRegex.MatchString(input) {
+		return fmt.Errorf("The %s contain invalid chars.\n", input)
+	}
+	return nil
+}
+
+/* End of Username & Foldername & Filename Check & Edit */
+
 /* UserInfo Functions*/
 
 func ReadUserInfo(jsonPath string) (JSONData, error) {
@@ -406,18 +515,6 @@ func CheckUserInfoExists(jsonPath string) error {
 		return err
 	}
 
-	return nil
-}
-
-func RegexCheck(input string) error {
-	inputRegex, err := regexp.Compile(`^[A-Za-z0-9]{3,10}$`)
-	if err != nil {
-		return fmt.Errorf("Regex Compile Error: %v\n", err)
-	}
-
-	if !inputRegex.MatchString(input) {
-		return fmt.Errorf("The %s contain invalid chars.\n", input)
-	}
 	return nil
 }
 

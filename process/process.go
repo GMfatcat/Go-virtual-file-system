@@ -71,13 +71,22 @@ func ProcessInput(input string) error {
 		}
 
 	case "create-file":
-		return nil
+		createFileErr := jsonObj.CreateFile(parts, setting.AppUserInfoPath)
+		if createFileErr != nil {
+			return createFileErr
+		}
 
 	case "delete-file":
-		return nil
+		deleteFileErr := jsonObj.DeleteFile(parts, setting.AppUserInfoPath)
+		if deleteFileErr != nil {
+			return deleteFileErr
+		}
 
 	case "list-files":
-		return nil
+		listFileErr := jsonObj.ListFiles(parts)
+		if listFileErr != nil {
+			return listFileErr
+		}
 
 	default:
 		return invalidCommandError
