@@ -16,9 +16,9 @@ var (
 	noKeywordError      = fmt.Errorf("No keyword found in the input\n")
 	noArgumentError     = fmt.Errorf("No keyword argument found in the input\n")
 	unClosedQuoteError  = fmt.Errorf("Unclosed double quote\n")
+	registerArgsError   = fmt.Errorf("Register requires 2 arguments\n")
 )
 
-/*Example: register username*/
 func ProcessInput(input string) error {
 
 	var parts []string
@@ -54,7 +54,14 @@ func ProcessInput(input string) error {
 	switch keyword {
 
 	case "register":
-		registerNameErr := jsonObj.RegisterName(parts[1], setting.AppUserInfoPath)
+
+		if len(parts) != 2 {
+			return registerArgsError
+		}
+
+		username := parts[1]
+
+		registerNameErr := jsonObj.RegisterName(username, setting.AppUserInfoPath)
 		if registerNameErr != nil {
 			return registerNameErr
 		}
