@@ -1,29 +1,32 @@
 # Go Command Line Virtual File System (VFS)
-## _Ease to Use, Cross Platform Tool_
+## _Ease to Use, Cross Platform Tool_ :ghost:
 
-VFS is a simple file management system written in Go, which can be easily build in different OS. 
-The Markdown format follows the ==Github Markdown Rule==.
+![Go](https://img.shields.io/badge/go-%2300ADD8.svg?style=for-the-badge&logo=go&logoColor=white)
 
-- Simple Command
-- Clear Screen Function smile
-- Support Whitespace Input
+VFS is a simple file management system written in [Go](https://go.dev/), which can be easily build in different OS. 
 
-## Functions
+The Markdown format follows the **Github Markdown Rule**.
+
+- Simple Command :sunglasses:
+- Clear Screen Function :smile:
+- Support Whitespace Input :muscle:
+
+## Functions :fire:
 - Register user
 - Create Folder / Delete Folder / Rename Folder / List Folders
 - Create File / Delete File / List Files
 - Help Command for command information
 - Whitespace Input Support Switch
 
-## How to use it?
+## How to use it? :hammer:
 
-1. Make sure to get a Go environment, version 1.20+
+1. Make sure to get a Go environment, version 1.20+ **(My go version: go1.21.6 windows/amd64)**
 2. Simple ```go run``` or ```go build```, more details bellow.
 
-## Installation
-==No== third party package needed, VFS only use standard package.
+## Installation :computer:
+**No** third party package needed, VFS only use standard package.
 
-## Build & Run
+## Build & Run :running:
 
 Go run -- No Executable file generated
 ```
@@ -40,16 +43,10 @@ Go build -- Executable file generated
 > ./vfs
 ```
 
-## System Architecture
+## System Architecture :clipboard:
 All user's folder and file will be store under ```app``` folder.
+
 ```app_user_info.json``` will record all user information, this file will be created automatically, the file can be found in the ```user``` folder.
-Unit Test file in both ```process``` and ```user``` folder. Test command as bellow.
-```
-// Unit test is not avaliable in the code for now.
-// Need to remove t.Skip() in the TestFunction to execute the test
-go test -v ./user
-go test -v ./process
-```
 | Folder | Usage |
 | ------ | ------ |
 | app | All user's folders and files |
@@ -57,7 +54,7 @@ go test -v ./process
 | setting | setting package |
 | user | user package |
 
-## Quick Start
+## Quick Start :tea:
 
 There are 3 basic command you should know first - ```help```, ```clear``` and ```exit```
 ```
@@ -77,7 +74,7 @@ Also there are limitations for the input (Username, Foldername, Fileame and Desc
 5. Whitespace not accepted by default, see more information bellow.
 
 
-## Basic User & Folder Usage
+## Basic User & Folder Usage :file_folder:
 
 Let's register a user, type ```register [username]```
 ```
@@ -136,7 +133,7 @@ list-folders fatcat --sort-name asc
 list-folders fatcat --sort-created asc
 ```
 
-## Basic User & File Usage
+## Basic User & File Usage :blue_book:
 
 We can create a file in one of the user's folder by ```create-file``` command
 ```
@@ -171,9 +168,9 @@ list-files fatcat folder1 --sort-name asc
 list-files fatcat folder1 --sort-created asc
 ```
 
-## Whitespace Input Support
+## Whitespace Input Support :gem:
 
-VFS supports whitespace input, but ==not in default mode==.
+VFS supports whitespace input, but **not in default mode**.
 
 Type ```status``` command to check whether the whitespace input is enabled.
 ```
@@ -193,7 +190,11 @@ Set Whitespace Support: true
 Set Whitespace Support: false
 ```
 
-**Important: use ==double quotes== to close the input with whitespace.**
+:red_circle: **Important: use double quotes to close the input with whitespace.**
+
+:red_circle: **Important: use double quotes to close the input with whitespace.**
+
+:red_circle: **Important: use double quotes to close the input with whitespace.**
 
 Let's see what's the difference between whitespace enabled and whitespace disabled
 ```
@@ -206,10 +207,19 @@ register fatcat -- PASS
 register "fat cat" -- PASS
 ```
 
-# Unit Test
+# Unit Test :cop:
+
+Unit Test file in both ```process``` and ```user``` folder. Test command as bellow.
+
+The ```app``` folder and ```user_info.json``` in ```user``` folder is for testing, not related with the main program, so you can just leave them there.
+```
+// Unit test is not avaliable in the code for now.
+// Need to remove t.Skip() in the TestFunction to execute the test
+go test -v ./user
+go test -v ./process
+```
 
 You can test the unit test by removing ```t.Skip()``` in the TestFunction.
-
 Quick Example:
 ```
 func TestExtractWhiteSpaceInput(t *testing.T) {
@@ -241,3 +251,15 @@ func TestExtractWhiteSpaceInput(t *testing.T) {
 	}
 }
 ```
+
+## Contact :smirk_cat:
+
+Author : Shang-Fong Yang (GMfatcat)
+
+Email : a60102244@gmail.com
+
+Github : [GMfatcat](https://github.com/GMfatcat)
+
+Project Done at 2024/1/21
+
+
