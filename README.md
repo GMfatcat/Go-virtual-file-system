@@ -69,7 +69,7 @@ There are 3 basic command you should know first - ```help```, ```clear``` and ``
 Also there are limitations for the input (Username, Foldername, Fileame and Description):
 1. Upper case characters accepted (A-Z)
 2. Lower case characters accepted (a-z)
-3. Digital accepted (0-9)
+3. Digit accepted (0-9)
 4. Length range from 3 to 10 characters
 5. Whitespace not accepted by default, see more information bellow.
 
