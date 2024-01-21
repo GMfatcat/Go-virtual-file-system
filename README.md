@@ -46,7 +46,7 @@ Go build -- Executable file generated
 ## System Architecture :clipboard:
 All user's folder and file will be store under ```app``` folder.
 
-```app_user_info.json``` will record all user information, this file will be created automatically, the file can be found in the ```user``` folder.
+```app_user_info.json``` will record all user information, this file will be created automatically in the ```user``` folder.
 | Folder | Usage |
 | ------ | ------ |
 | app | All user's folders and files |
