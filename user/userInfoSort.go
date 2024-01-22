@@ -37,8 +37,8 @@ func (jsonObj *JSONData) SortFolder(inputParts []string) {
 	// Show Sort Result
 	fmt.Fprintf(os.Stdout, "Sort Type: %s, Sort Rule: %s\n", sortType, sortRule)
 	for _, folder := range userInfo.Folders {
-		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
-			folder.Name, folder.CreatedAt.Format(time.RFC822))
+		fmt.Fprintf(os.Stdout, "Name:%s Description:%s Time:%s\n",
+			folder.Name, folder.Description, folder.CreatedAt.Format(time.RFC822))
 	}
 }
 
@@ -71,8 +71,8 @@ func (jsonObj *JSONData) SortFile(inputParts []string) {
 	fmt.Fprintf(os.Stdout, "Folder: %s, Sort Type: %s, Sort Rule: %s\n",
 		foldername, sortType, sortRule)
 	for _, file := range userInfo.Files {
-		fmt.Fprintf(os.Stdout, "Name:%s Time:%s\n",
-			file.Name, file.CreatedAt.Format(time.RFC822))
+		fmt.Fprintf(os.Stdout, "Name:%s Description:%s Time:%s\n",
+			file.Name, file.Description, file.CreatedAt.Format(time.RFC822))
 	}
 
 }
